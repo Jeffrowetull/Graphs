@@ -1,3 +1,5 @@
+import itertools, random
+from util import Queue
 class User:
     def __init__(self, name):
         self.name = name
@@ -43,10 +45,19 @@ class SocialGraph:
         self.users = {}
         self.friendships = {}
         # !!!! IMPLEMENT ME
-
+        
         # Add users
-
+        for x in range(num_users):
+            self.add_user(f'User {x+1}')
         # Create friendships
+        possible_friendships = list(itertools.combinations(range(1,num_users+1),2))
+        random.shuffle(possible_friendships)
+        friend_num = num_users*avg_friendships//2
+        print(friend_num)
+        new_friends = possible_friendships[:friend_num]
+        print('hi',new_friends)
+        for bond in new_friends:
+            self.add_friendship(bond[0],bond[1])
 
     def get_all_social_paths(self, user_id):
         """
@@ -59,7 +70,23 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        #definitely a searchy sort of thing, probably bfs because we want the shortest paths
+        q = Queue()
+        q.enqueue([user_id])
+        bisited = set()
+        while q.size() > 0:
+            path = q.dequeue()
+            checker = path[-1]
+            if checker not in bisited:
+                bisited.add(checker)
+                if checker != user_id:
+                    visited.update({f'{checker}':path})
+                for connection in self.friendships[checker]:
+                    new_path = path.copy()
+                    new_path.append(connection)
+                    q.enqueue(new_path)
         return visited
+
 
 
 if __name__ == '__main__':
